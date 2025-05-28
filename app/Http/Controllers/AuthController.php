@@ -4,8 +4,8 @@ namespace App\Http\Controllers;
 
 use App\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
-use PDOException;
+
+use function Laravel\Prompts\password;
 
 class AuthController extends Controller
 {
@@ -36,15 +36,40 @@ class AuthController extends Controller
         $username = $request->input('text_username');
         $password = $request->input('text_password');
 
-        // get all the users from the database
-        // $users = User::all()->toArray();
+        // Check if user exists
+        $user = User::where('username',$username)
+                      ->where('deleted_at',null)
+                      ->first();
 
-        // as an object instance of the model's class
-        $userModel = new User();
-        $users = $userModel->all()->toArray();
-    
-        echo '<pre>';
-        print_r($users);
+        if(!$user) {
+            return redirect()
+                    ->back()
+                    ->withInput()
+                    ->with('loginError','Username ou password incorretos');
+        }
+
+        // check if password is correct
+        if(!password_verify($password,$user->password)) {
+            return redirect()
+                    ->back()
+                    ->withInput()
+                    ->with('loginError','Username ou password incorretos');
+        }
+
+        // update last login
+        $user->last_login = date('Y-m-d H:i:s');
+        $user->save();
+
+        // login user
+        session([
+            'user' => [
+                'id' => $user->id,
+                'username' => $user->username
+            ]
+        ]);
+
+
+        echo 'Login com sucesso';
     }
 
     public function logout()
