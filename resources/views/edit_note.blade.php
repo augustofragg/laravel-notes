@@ -22,11 +22,12 @@
             <!-- form -->
             <form action="{{route('editNoteSubmit')}}" method="post">
                 @csrf
+                <input type="hidden" name="note_id" value="{{ Crypt::encrypt($note->id)}}">
                 <div class="row mt-3">
                     <div class="col">
                         <div class="mb-3">
                             <label class="form-label">Note Title</label>
-                            <input type="text" class="form-control bg-primary text-white" name="text_title" value="{{ old('text_title',$node->title)}}">
+                            <input type="text" class="form-control bg-primary text-white" name="text_title" value="{{ old('text_title',$note->title)}}">
                             {{-- show error --}}
                             @error('text_title')
                                 <div class="text-danger">{{$message}}</div>    
@@ -34,7 +35,7 @@
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Note Text</label>
-                            <textarea class="form-control bg-primary text-white" name="text_note" rows="5">{{ old('text_title',$node->text)}}</textarea>
+                            <textarea class="form-control bg-primary text-white" name="text_note" rows="5">{{ old('text_title',$note->text)}}</textarea>
                             {{-- show error --}}
                             @error('text_note')
                                 <div class="text-danger">{{$message}}</div>    
